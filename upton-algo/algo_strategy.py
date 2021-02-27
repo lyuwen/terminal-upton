@@ -463,6 +463,37 @@ class AlgoStrategy(gamelib.AlgoCore):
         return x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, h, r
 
 
+    def get_active_defense_locations(self, defense_type):
+        """ Return the coordinates for active defense strategy
+        """
+        if defense_type == 0:
+            # Left active defense
+            return 
+        elif defense_type == 1:
+            # Right active defense
+            return
+        else:
+            raise ValueError
+
+
+    def active_defense(self, game_state, defense_type):
+        """ Build active defenses
+        """
+        active_locations = self.get_active_defense_locations(defense_type)
+        oppo_MP = game_state.get_resource(MP, player_index=1)
+        # marked deleted: game_state.contains_stationary_unit(location).pending_removal
+        if oppo_MP < 15:
+            pass
+        elif oppo_MP < 25:
+            pass
+        elif oppo_MP < 35:
+            pass
+        elif oppo_MP < 45:
+            pass
+        else:
+            pass
+
+
 if __name__ == "__main__":
     algo = AlgoStrategy()
     algo.start()
