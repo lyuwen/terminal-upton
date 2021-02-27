@@ -207,7 +207,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 return
 
         # (g)
-        if unit_type, locations, upgrade in [
+        for unit_type, locations, upgrade in [
                 (WALL, [[19,11],[20,11]], False),
                 (TURRET, [[20,10]], False),
                 (TURRET, [[19,10]], False),
