@@ -178,34 +178,56 @@ class AlgoStrategy(gamelib.AlgoCore):
         # (a) self repair 1
         wall_locations_a = [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],\
         [14,2],[15,3],[16,4],[17,5],[18,6],[19,7],[20,8]]
-        completeness_a = \
-        self.self_repair(self, game_state=game_state, locations=wall_locations_a, unit_type=WALL, hp_percent=.5, upgrade=False)
+        if not self.self_repair(game_state=game_state, locations=wall_locations_a, unit_type=WALL, hp_percent=.5, upgrade=False):
+            return
         
         # (b) self repair 2
-        if completeness_a:
-            upgraded_turret_locations_b = [[3,12],[24,12]]
-            completeness_b = \
-                self.self_repair(self, game_state=game_state, locations=upgraded_turret_locations_b, unit_type=TURRET, hp_percent=.5, upgrade=True)
+        upgraded_turret_locations_b = [[3,12],[24,12]]
+        if not self.self_repair(game_state=game_state, locations=upgraded_turret_locations_b, unit_type=TURRET, hp_percent=.5, upgrade=True):
+          return
         
         # TODO (c) self repair 3
-        if completeness_b:
-            upgraded_turret_locations_c = [[20,9],[22,11]]
-            completeness_c = \
-                self.self_repair(self, game_state=game_state, locations=upgraded_turret_locations_c, unit_type=TURRET, hp_percent=.5, upgrade=True)
+        upgraded_turret_locations_c = [[20,9],[22,11]]
+        if not self.self_repair(game_state=game_state, locations=upgraded_turret_locations_c, unit_type=TURRET, hp_percent=.5, upgrade=True):
+          return
         
-        # TODO turn based static defenses
-        if completeness_c:
-            turn_number = game_state.turn_number
-            if turn_number >= 5 and turn_number <= 20:
-                wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
-                spawned_units = game_state.attempt_spawn(WALL, wall_locations_d)
-                game_state.attempt_remove(wall_locations[:spawned_units])
-            elif turn_number >= 21 and turn_number <= 50:
-                wall_locations_e = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
-                self.self_repair(self, game_state=game_state, locations=wall_locations_e, unit_type=WALL, hp_percent=.5, upgrade=False)
-            elif turn_number >= 51 and turn_number <= 100:
-                upgraded_wall_locations_f = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
-                self.self_repair(self, game_state=game_state, locations=upgraded_wall_locations_f, unit_type=WALL, hp_percent=.5, upgrade=True)
+        # TODO turn based static defenses (d) (e) (f)
+        turn_number = game_state.turn_number
+        if turn_number >= 5 and turn_number <= 20:
+            wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            if not self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True):
+                return
+        elif turn_number >= 21 and turn_number <= 50:
+            wall_locations_e = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            if not self.self_repair(game_state=game_state, locations=wall_locations_e, unit_type=WALL, hp_percent=.5, upgrade=False):
+                return
+        elif turn_number >= 51 and turn_number <= 100:
+            upgraded_wall_locations_f = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            if not self.self_repair(game_state=game_state, locations=upgraded_wall_locations_f, unit_type=WALL, hp_percent=.5, upgrade=True):
+                return
+
+        # (g)
+        if unit_type, locations, upgrade in [
+                (WALL, [[19,11],[20,11]], False),
+                (TURRET, [[20,10]], False),
+                (TURRET, [[19,10]], False),
+                (TURRET, [[20,10]], True),
+                (TURRET, [[19,10]], True),
+                (WALL, [[19,11],[20,11]], True),
+                (TURRET, [[22,12]], False),
+                (TURRET, [[22,12]], True),
+                (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], False),
+                (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], True),
+                ]:
+            if upgrade:
+                locations_to_upgrade = [location for location in locations if self.contains_stationary_unit(location) and not self.contains_stationary_unit(location).upgraded]
+                number_upgraded = game_state.attempt_upgrade(locations_to_upgrade)
+                if len(locations_to_upgrade) != number_upgraded:
+                    return
+            else:
+                if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
+                    return
+
 
 
     def build_defenses(self, game_state, locations, unit_type, upgrade=False, mark_remove=False):
