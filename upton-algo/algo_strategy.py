@@ -175,32 +175,37 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
 
         # High priority static defenses
-        # TODO (a) self repair 1
-        turret_locations = []
-        #  game_state.attempt_spawn(TURRET, turret_locations)
-        #  game_state.attempt_upgrade(turret_locations)
-
-        wall_locations = []
-        # Find walls with less than half hp
-        self.find_low_hp_buildings(game_state, wall_locations, hp_percent=0.5)
-        #  game_state.attempt_spawn(WALL, wall_locations)
-
-        #  game_state.attempt_remove(wall_locations)
-
-        # TODO (b) self repair 2
-
+        # (a) self repair 1
+        wall_locations_a = [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],\
+        [14,2],[15,3],[16,4],[17,5],[18,6],[19,7],[20,8]]
+        completeness_a = \
+        self.self_repair(self, game_state=game_state, locations=wall_locations_a, unit_type=WALL, hp_percent=.5, upgrade=False)
+        
+        # (b) self repair 2
+        if completeness_a:
+            upgraded_turret_locations_b = [[3,12],[24,12]]
+            completeness_b = \
+                self.self_repair(self, game_state=game_state, locations=upgraded_turret_locations_b, unit_type=TURRET, hp_percent=.5, upgrade=True)
+        
         # TODO (c) self repair 3
-
-
+        if completeness_b:
+            upgraded_turret_locations_c = [[20,9],[22,11]]
+            completeness_c = \
+                self.self_repair(self, game_state=game_state, locations=upgraded_turret_locations_c, unit_type=TURRET, hp_percent=.5, upgrade=True)
+        
         # TODO turn based static defenses
-        turn_number = game_state.turn_number
-
-        if turn_number >= 5 and turn_number <= 20:
-            pass
-        elif turn_number >= 21 and turn_number <= 50:
-            pass
-        elif turn_number >= 51 and turn_number <= 100:
-            pass
+        if completeness_c:
+            turn_number = game_state.turn_number
+            if turn_number >= 5 and turn_number <= 20:
+                wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+                spawned_units = game_state.attempt_spawn(WALL, wall_locations_d)
+                game_state.attempt_remove(wall_locations[:spawned_units])
+            elif turn_number >= 21 and turn_number <= 50:
+                wall_locations_e = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+                self.self_repair(self, game_state=game_state, locations=wall_locations_e, unit_type=WALL, hp_percent=.5, upgrade=False)
+            elif turn_number >= 51 and turn_number <= 100:
+                upgraded_wall_locations_f = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+                self.self_repair(self, game_state=game_state, locations=upgraded_wall_locations_f, unit_type=WALL, hp_percent=.5, upgrade=True)
 
 
     def build_defenses(self, game_state, locations, unit_type, upgrade=False, mark_remove=False):
@@ -328,23 +333,27 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         if (mp >= term_a - 5.5*w + term_b + 4 + r//10) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
             f = 0
+            self.continuous_f_0 += 1
             c = 0
             a = 0
             b = 0
         # TODO the above condition may not be necessary since all variables are intialed as 0
         elif (term_b - 5.5*w)/(term_a - 5.5*w + term_b) >= (term_b_1 - 5.5*w_1)/(term_a_1 - 5.5*w_1 + term_b_1):
             f = 1
+            self.continuous_f_0 = 0
             c = 2
             a = term_a_1
             b = mp - a
         elif (term_b - 5.5*w)/(term_a - 5.5*w + term_b) < (term_b_1 - 5.5*w_1)/(term_a_1 - 5.5*w_1 + term_b_1):
             f = 2
+            self.continuous_f_0 = 0
             c = 2
             a = term_a
             b = mp - a
 
-        if f == 0: # TODO for previous 4 sequential turns?!
+        if f == 0 and self.continuous_f_0 == 5:
             d = (mp - e)//4
+            self.continuous_f_0 = 0
         else:
             d = 0
 
