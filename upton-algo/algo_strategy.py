@@ -220,7 +220,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                 (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], True),
                 ]:
             if upgrade:
-                locations_to_upgrade = [location for location in locations if self.contains_stationary_unit(location) and not self.contains_stationary_unit(location).upgraded]
+                locations_to_upgrade = [location for location in locations \
+                    if game_state.contains_stationary_unit(location) and not game_state.contains_stationary_unit(location).upgraded]
                 number_upgraded = game_state.attempt_upgrade(locations_to_upgrade)
                 if len(locations_to_upgrade) != number_upgraded:
                     return
