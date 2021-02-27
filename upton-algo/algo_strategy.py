@@ -195,7 +195,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         turn_number = game_state.turn_number
         if turn_number >= 5 and turn_number <= 20:
             wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
-            if not self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True):
+            defenses_built = self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True):
+            if defenses_built != len(wall_locations_d):
                 return
         elif turn_number >= 21 and turn_number <= 50:
             wall_locations_e = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
@@ -260,6 +261,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                     raise Exception("Number of spawn buildings does not match upgraded buildings.")
                 if number_affordable < len(locaitons):
                     build_status += self.build_defenses(game_state, locations[number_affordable:], unit_type, upgrade=False, mark_remove=mark_remove)
+            if mark_remove:
+                game_state.attempt_remove(locations[:number_affordable])
             return build_status
 
 
