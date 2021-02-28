@@ -399,6 +399,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         else:
             d = 0
 
+
+        a = int(a)
+        b = int(b)
+
         sp_l = sp - c
         mp_l = mp - a - b - 2*d - e
 
