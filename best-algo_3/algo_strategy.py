@@ -416,18 +416,19 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         decision_table = [
             [ 0,  10,  6 , 3],
-            [10,  20,  9,  6],
-            [20,  30, 11,  7],
-            [30,  40, 12, 10],
-            [40, 100, 15, 11],
+            [10,  20,  9,  4],
+            [20,  30, 11,  5],
+            [30,  40, 12,  6],
+            [40, 100, 15,  8],
             ]
 
         for turn_min, turn_max, a_1, b_1 in decision_table:
             if turn_min <= r < turn_max:
-                if (mp - e) >= (a_1 + b_1):
+                if mp >= (a_1 + b_1):
                     f = random.randint(1, 2)
                     a = a_1
                     b = b_1
+                    e = 0
                 else:
                     f = 0
                     a = b = 0
