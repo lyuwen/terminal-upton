@@ -234,7 +234,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             else:
                 if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
                     return
-            if game_state.get_resource(SP) < SP_before_extra * 0.7:
+            if game_state.get_resource(SP) < SP_before_extra * 0.6:
                 gamelib.debug_write("\u001b[32m extra static defense in turn {}: {} {} \u001b[0m".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
                 return
 
@@ -562,12 +562,12 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         if defense_type == 0:
             # Left active defense
-            locations_ours = [[0,13],[1,13],[0,13],[1,12],[2,12]]
+            locations_ours = [[0,13],[1,13],[1,12],[2,12]]
             locations_oppo = [[1,14],[2,14],[1,15]]
             return locations_ours, locations_oppo
         elif defense_type == 1:
             # Right active defense
-            locations_ours = [[26,13],[27,13],[27,13],[26,12],[27,12]]
+            locations_ours = [[27,13],[26,13],[26,12],[27,12]]
             locations_oppo = [[26,14],[2,15],[25,15]]
             return locations_ours, locations_oppo
         else:
@@ -599,22 +599,22 @@ class AlgoStrategy(gamelib.AlgoCore):
         #      return
         if trigger:
             if oppo_MP >= 15:
-                if not game_state.attempt_upgrade(active_locations[2]):
+                if not game_state.attempt_upgrade(active_locations[:2]):
                     return
             if oppo_MP >= 25:
+                if self.build_defenses(game_state, active_locations[2], TURRET, mark_remove=True):
+                    return
+                #  if not game_state.attempt_spawn(TURRET, active_locations[2]):
+                #      return
+            if oppo_MP >= 35:
+                if not game_state.attempt_upgrade(active_locations[2]):
+                    return
+            if oppo_MP >= 45:
                 if self.build_defenses(game_state, active_locations[3], TURRET, mark_remove=True):
                     return
                 #  if not game_state.attempt_spawn(TURRET, active_locations[3]):
                 #      return
-            if oppo_MP >= 35:
                 if not game_state.attempt_upgrade(active_locations[3]):
-                    return
-            if oppo_MP >= 45:
-                if self.build_defenses(game_state, active_locations[4], TURRET, mark_remove=True):
-                    return
-                #  if not game_state.attempt_spawn(TURRET, active_locations[4]):
-                #      return
-                if not game_state.attempt_upgrade(active_locations[4]):
                     return
 
 
