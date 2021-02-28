@@ -360,10 +360,12 @@ class AlgoStrategy(gamelib.AlgoCore):
                 # 9 (c)
                 if a != 0:
                     # TODO send scount
-                    scount_location_a = [[11,2]]
+                    #  scount_location_a = [[11,2]]
+                    scount_location_a = [[13,0]]
                     game_state.attempt_spawn(SCOUT, scount_location_a, a)
                 if b != 0:
-                    scount_location_b = [[10,3]]
+                    #  scount_location_b = [[10,3]]
+                    scount_location_b = [[12,1]]
                     game_state.attempt_spawn(SCOUT, scount_location_b, b)
                 if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
                     gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
@@ -378,10 +380,12 @@ class AlgoStrategy(gamelib.AlgoCore):
                 # 9 (c)
                 if a != 0:
                     # TODO send scount
-                    scount_location_a = [[19,5]]
+                    #  scount_location_a = [[19,5]]
+                    scount_location_a = [[14,0]]
                     game_state.attempt_spawn(SCOUT, scount_location_a, a)
                 if b != 0:
-                    scount_location_b = [[20,6]]
+                    #  scount_location_b = [[20,6]]
+                    scount_location_b = [[15,1]]
                     game_state.attempt_spawn(SCOUT, scount_location_b, b)
                 if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
                     gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
