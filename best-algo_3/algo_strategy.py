@@ -333,7 +333,8 @@ class AlgoStrategy(gamelib.AlgoCore):
     def main_decision(self, game_state):
         """ The main responsive active defense and offense strategy.
         """
-        a, b, c, d, e, f, h, mp, sp, mp_l, sp_l = self.decision_function(game_state)
+        #  a, b, c, d, e, f, h, mp, sp, mp_l, sp_l = self.decision_function(game_state)
+        a, b, c, d, e, f, h, mp, sp, mp_l, sp_l = self.decision_function_1(game_state)
 
         gamelib.debug_write(f"\u001b[32m main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l} \u001b[0m")
 
@@ -393,6 +394,43 @@ class AlgoStrategy(gamelib.AlgoCore):
             self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
 
         return 1
+
+
+    def decision_function_1(self, game_state):
+        """ The decision function for the main stage of the game.
+        """
+        x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, health, r, m = self.gather_info_from_gamestate(game_state)
+        a, b, c, d, e, f, d, h, mp_l, sp_l = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+        gamelib.debug_write(f"\u001b[32m decision_function at round {r}: " \
+            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} health={health} r={r} \u001b[0m")
+
+        # TODO main decision for the strategy
+        #  e = (5<= r < 20) + 2*(20 <= r <40) + 3*(40 <= r < 60) + 4*(60 <= r < 80) + 5*(r <= 100)
+        # TODO if r in [0, 100) the following is the optimal approach
+        e = r // 20 + 1
+
+        decision_table = [
+            [ 0,  10,  9 , 5],
+            [10,  20, 12,  7],
+            [20,  30, 14,  9],
+            [30,  40, 15, 12],
+            [40, 100, 16, 12],
+            ]
+
+        for turn_min, turn_max, a_1, b_1 in decision_table:
+            if (mp - e) >= (a_1 + b_1):
+                f = random.randint(1, 2)
+                a = a_1
+                b = b_1
+            else:
+                f = 0
+                a = b = 0
+
+        sp_l = sp - c
+        mp_l = mp - a - b - 2*d - e
+
+        return a, b, c, d, e, f, h, mp, sp, mp_l, sp_l
 
 
     def decision_function(self, game_state):
