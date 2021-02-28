@@ -365,7 +365,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(SCOUT, scount_location_a, a)
                 if b != 0:
                     #  scount_location_b = [[10,3]]
-                    scount_location_b = [[12,1]]
+                    scount_location_b = [[11,2]]
                     game_state.attempt_spawn(SCOUT, scount_location_b, b)
                 if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
                     gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
@@ -385,7 +385,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(SCOUT, scount_location_a, a)
                 if b != 0:
                     #  scount_location_b = [[20,6]]
-                    scount_location_b = [[15,1]]
+                    scount_location_b = [[16,2]]
                     game_state.attempt_spawn(SCOUT, scount_location_b, b)
                 if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
                     gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
@@ -415,21 +415,22 @@ class AlgoStrategy(gamelib.AlgoCore):
         e = r // 20 + 1
 
         decision_table = [
-            [ 0,  10,  9 , 5],
-            [10,  20, 12,  7],
-            [20,  30, 14,  9],
-            [30,  40, 15, 12],
-            [40, 100, 16, 12],
+            [ 0,  10,  6 , 3],
+            [10,  20,  9,  6],
+            [20,  30, 11,  7],
+            [30,  40, 12, 10],
+            [40, 100, 15, 11],
             ]
 
         for turn_min, turn_max, a_1, b_1 in decision_table:
-            if (mp - e) >= (a_1 + b_1):
-                f = random.randint(1, 2)
-                a = a_1
-                b = b_1
-            else:
-                f = 0
-                a = b = 0
+            if turn_min <= r < turn_max:
+                if (mp - e) >= (a_1 + b_1):
+                    f = random.randint(1, 2)
+                    a = a_1
+                    b = b_1
+                else:
+                    f = 0
+                    a = b = 0
 
         sp_l = sp - c
         mp_l = mp - a - b - 2*d - e
