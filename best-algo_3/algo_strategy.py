@@ -421,19 +421,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             c = 0
             a = 0
             b = 0
-        elif (mp < term_a - 5.5*w + term_b + 4 + r//20):
-            f = 1
-            self.continuous_f_0 = 0
-            c = 2
-            a = term_a
-            b = mp - a
-        elif (mp < term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
-            f = 2
-            self.continuous_f_0 = 0
-            c = 2
-            a_1 = term_a_1
-            b = mp - a
-        else:
+
+        if (mp >= term_a - 5.5*w + term_b + 4 + r//20) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
             if ((term_a - 5.5*w + term_b) == 0) or ((term_a_1 - 5.5*w_1 + term_b_1) == 0):
                 if mp >= 10 + r//4:
                     self.continuous_f_0 = 0
@@ -465,6 +454,20 @@ class AlgoStrategy(gamelib.AlgoCore):
                 c = 2
                 a_1 = term_a_1
                 b = mp - a
+
+        elif (mp >= term_a - 5.5*w + term_b + 4 + r//20):
+            f = 1
+            self.continuous_f_0 = 0
+            c = 2
+            a = term_a
+            b = mp - a
+        elif (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
+            f = 2
+            self.continuous_f_0 = 0
+            c = 2
+            a_1 = term_a_1
+            b = mp - a
+            
 
         if f == 0 and self.continuous_f_0 == 9:
             if m == 1:
