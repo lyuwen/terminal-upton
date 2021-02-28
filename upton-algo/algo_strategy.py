@@ -323,7 +323,7 @@ class AlgoStrategy(gamelib.AlgoCore):
     def main_decision(self, game_state):
         """ The main responsive active defense and offense strategy.
         """
-        a, b, c, d, e, f, h, mp_l, sp_l = self.decision_function(game_state)
+        a, b, c, d, e, f, h, mp, sp, mp_l, sp_l = self.decision_function(game_state)
 
         gamelib.debug_write(f"\u001b[32m main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l} \u001b[0m")
 
@@ -343,35 +343,41 @@ class AlgoStrategy(gamelib.AlgoCore):
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
             # left active defense
-            if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
-                gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
-                return
             self.active_defense(game_state, defense_type=0) # left
 
-            # 9 (c)
-            if a != 0:
-                # TODO send scount
-                scount_location_a = [[11,2]]
-                game_state.attempt_spawn(SCOUT, scount_location_a, a)
-            if b != 0:
-                scount_location_b = [[10,3]]
-                game_state.attempt_spawn(SCOUT, scount_location_b, b)
+            if sp >= 9:
+                # 9 (c)
+                if a != 0:
+                    # TODO send scount
+                    scount_location_a = [[11,2]]
+                    game_state.attempt_spawn(SCOUT, scount_location_a, a)
+                if b != 0:
+                    scount_location_b = [[10,3]]
+                    game_state.attempt_spawn(SCOUT, scount_location_b, b)
+                if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
+                    gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
+                    return
+            else:
+                self.active_defense(game_state, defense_type=1) # right
         elif f == 2:
             # right active defense
-            if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
-                gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
-                return
             self.active_defense(game_state, defense_type=1) # right
 
-            # 9 (c)
-            if a != 0:
-                # TODO send scount
-                scount_location_a = [[19,5]]
-                game_state.attempt_spawn(SCOUT, scount_location_a, a)
-            if b != 0:
-                scount_location_b = [[20,6]]
-                game_state.attempt_spawn(SCOUT, scount_location_b, b)
-        if c!= 0:
+            if sp >= 9:
+                # 9 (c)
+                if a != 0:
+                    # TODO send scount
+                    scount_location_a = [[19,5]]
+                    game_state.attempt_spawn(SCOUT, scount_location_a, a)
+                if b != 0:
+                    scount_location_b = [[20,6]]
+                    game_state.attempt_spawn(SCOUT, scount_location_b, b)
+                if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
+                    gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
+                    return
+            else:
+                self.active_defense(game_state, defense_type=0) # left
+        if (f != 0) and (c != 0):
             # Support
             support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
             self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
@@ -453,7 +459,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         sp_l = sp - c
         mp_l = mp - a - b - 2*d - e
 
-        return a, b, c, d, e, f, h, mp_l, sp_l
+        return a, b, c, d, e, f, h, mp, sp, mp_l, sp_l
 
     def g_function(self, i, j, t):
         """A function used in decision_function.
