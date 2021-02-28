@@ -223,8 +223,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                 (TURRET, [[19,10]], False),
                 (TURRET, [[20,10]], True),
                 (TURRET, [[19,10]], True),
-                (TURRET, [[5,12]], False),
-                (TURRET, [[5,12]], True),
+                #  (TURRET, [[5,12]], False),
+                #  (TURRET, [[5,12]], True),
                 (SUPPORT, [[14,6],[15,6]], False),
                 (SUPPORT, [[14,6],[15,6]], True),
                 (WALL, [[19,11],[20,11]], True),
@@ -233,8 +233,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                 (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], False),
                 (SUPPORT, [[14,5],[15,5]], False),
                 (SUPPORT, [[14,5],[15,5]], True),
-                (TURRET, [[5,11]], False),
-                (TURRET, [[5,11]], True),
+                #  (TURRET, [[5,11]], False),
+                #  (TURRET, [[5,11]], True),
                 (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], True),
                 (SUPPORT, [[14,4],[15,4]], False),
                 (SUPPORT, [[14,4],[15,4]], True),
@@ -385,7 +385,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 self.active_defense(game_state, defense_type=1) # right
         elif f == 2:
             # right active defense
-            self.active_defense(game_state, defense_type=1) # right
+            #  self.active_defense(game_state, defense_type=1) # right
             #  self.left_offensive_walls(game_state)
 
             remaining_sp = game_state.get_resource(SP)
@@ -405,6 +405,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             else:
                 self.left_defensive_walls(game_state)
                 #  self.active_defense(game_state, defense_type=0) # left
+            self.active_defense(game_state, defense_type=1) # right
         if (f != 0) and (c != 0):
             # Support
             support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
@@ -537,7 +538,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     f = random.randint(1, 2)
                     a = a_1
                     b = b_1
-                    e = 0
+                    #  e = 0
                 else:
                     f = 0
                     a = b = 0
@@ -689,14 +690,14 @@ class AlgoStrategy(gamelib.AlgoCore):
                 if not game_state.attempt_upgrade(active_locations[:2]):
                     return
             if oppo_MP >= 25:
-                if self.build_defenses(game_state, active_locations[2], TURRET, mark_remove=True):
+                if self.build_defenses(game_state, [active_locations[2]], TURRET, mark_remove=True):
                     return
                 #  if not game_state.attempt_spawn(TURRET, active_locations[2]):
                 #      return
                 if not game_state.attempt_upgrade(active_locations[2]):
                     return
             if oppo_MP >= 35:
-                if self.build_defenses(game_state, active_locations[3], TURRET, mark_remove=True):
+                if self.build_defenses(game_state, [active_locations[3]], TURRET, mark_remove=True):
                     return
                 if not game_state.attempt_upgrade(active_locations[3]):
                     return
