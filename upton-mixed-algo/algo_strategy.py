@@ -139,6 +139,10 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(WALL, wall_locations)
 
             game_state.attempt_remove(wall_locations)
+
+            walls_to_remove = [[4, 11], [5, 10], [6, 9], [7, 8], [8, 7], [9, 6], [10, 5], [11, 4], [12, 3], [13, 2], [14, 2]]
+            turrets_to_remove = [[3, 12]]
+            game_state.attempt_remove(walls_to_remove + turrets_to_remove)
         elif turn_number >= 5:
             return
 
@@ -177,13 +181,14 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         # High priority static defenses
         # (a) self repair 1
-        wall_locations_a = [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],\
-        [14,2],[15,3],[16,4],[17,5],[18,6],[19,7],[20,8]]
+        #  wall_locations_a = [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],[14,2]]
+        #  wall_locations_a += [[15,3],[16,4],[17,5],[18,6],[19,7],[20,8]]
+        wall_locations_a = [[15,3],[16,4],[17,5],[18,6],[19,7],[20,8]]
         if not self.self_repair(game_state=game_state, locations=wall_locations_a, unit_type=WALL, hp_percent=.5, upgrade=False):
             return
         
         # (b) self repair 2
-        upgraded_turret_locations_b = [[3,12],[24,12]]
+        upgraded_turret_locations_b = [[24,12]]
         if not self.self_repair(game_state=game_state, locations=upgraded_turret_locations_b, unit_type=TURRET, hp_percent=.5, upgrade=True):
           return
         
@@ -195,16 +200,16 @@ class AlgoStrategy(gamelib.AlgoCore):
         # TODO turn based static defenses (d) (e) (f)
         turn_number = game_state.turn_number
         if turn_number >= 5 and turn_number <= 20:
-            wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            wall_locations_d = [[24,13],[25,13],[23,12]]
             defenses_built = self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True)
             if defenses_built != len(wall_locations_d):
                 return
         elif turn_number >= 21 and turn_number <= 50:
-            wall_locations_e = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            wall_locations_e = [[24,13],[25,13],[23,12]]
             if not self.self_repair(game_state=game_state, locations=wall_locations_e, unit_type=WALL, hp_percent=.5, upgrade=False):
                 return
         elif turn_number >= 51 and turn_number <= 100:
-            upgraded_wall_locations_f = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
+            upgraded_wall_locations_f = [[24,13],[25,13],[23,12]]
             if not self.self_repair(game_state=game_state, locations=upgraded_wall_locations_f, unit_type=WALL, hp_percent=.5, upgrade=True):
                 return
 
@@ -334,7 +339,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         """ The main responsive active defense and offense strategy.
         """
         turn_number = game_state.turn_number
-        if turn_number <= 31:
+        if turn_number <= 40:
             a, b, c, d, e, f, h, mp, sp, mp_l, sp_l = self.decision_function(game_state)
             sp_threshold = 9
         else:
@@ -355,13 +360,16 @@ class AlgoStrategy(gamelib.AlgoCore):
         if f == 0:
             # left & right active defense
             gamelib.debug_write("\u001b[32m active defense on left & right \u001b[0m")
-            self.active_defense(game_state, defense_type=0) # left
+            #  self.active_defense(game_state, defense_type=0) # left
+            self.left_defensive_walls(game_state)
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
             # left active defense
-            self.active_defense(game_state, defense_type=0) # left
+            #  self.active_defense(game_state, defense_type=0) # left
+            self.left_defensive_walls(game_state)
 
-            if sp >= sp_threshold:
+            remaining_sp = game_state.get_resource(SP)
+            if remaining_sp >= sp_threshold:
                 # 9 (c)
                 if a != 0:
                     # TODO send scount
@@ -378,8 +386,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         elif f == 2:
             # right active defense
             self.active_defense(game_state, defense_type=1) # right
+            #  self.left_offensive_walls(game_state)
 
-            if sp >= sp_threshold:
+            remaining_sp = game_state.get_resource(SP)
+            if remaining_sp - 16 >= sp_threshold:
+                self.left_offensive_walls(game_state)
                 # 9 (c)
                 if a != 0:
                     # TODO send scount
@@ -392,13 +403,33 @@ class AlgoStrategy(gamelib.AlgoCore):
                     gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
                     return
             else:
-                self.active_defense(game_state, defense_type=0) # left
+                self.left_defensive_walls(game_state)
+                #  self.active_defense(game_state, defense_type=0) # left
         if (f != 0) and (c != 0):
             # Support
             support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
             self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
 
         return 1
+
+
+    def left_defensive_walls(self, game_state):
+        wall_locations = [[0,13],[1,12],[2,11],[3,10],[4,9],[5,8],[6,7],[7,6],[8,5],[9,4],[10,3],[11,3],[12,3],[13,3],[14,3]]
+        wall_upgrades = wall_locations[:2]
+        walls_built = self.build_defenses(game_state, wall_locations, WALL, mark_remove=True)
+        walls_upgraded = game_state.attempt_upgrade(wall_upgrades)
+        if walls_upgraded != len(wall_upgrades):
+            return False
+        else:
+            return walls_built
+
+
+    def left_offensive_walls(self, game_state):
+        wall_locations = [[2,13],[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],[14,2]]
+        turret_locations = [[3,13]]
+        walls_built = self.build_defenses(game_state, wall_locations, WALL, mark_remove=True)
+        turrets_built = self.build_defenses(game_state, turret_locations, TURRET, upgrade=True, mark_remove=True)
+        return walls_built + turrets_built
 
 
     def decision_function(self, game_state):
