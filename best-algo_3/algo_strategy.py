@@ -413,6 +413,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         term_a_1 = self.g_function((x_1+.25*z_1)*w_1, y_1*w_1, w_1)
         term_b_1 = self.g_function(x_1+0.25*z_1, y_1, w_1)
 
+        mp -= e
+
         gamelib.debug_write(f"\u001b[32m decision_function at round {r}: term_a={term_a}, term_b={term_b}, term_a_1={term_a_1}, term_b_1={term_b_1} \u001b[0m")
 
         if (mp < term_a - 5.5*w + term_b + 4 + r//20) and (mp < term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
@@ -471,9 +473,9 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         if f == 0 and self.continuous_f_0 == 9:
             if m == 1:
-                d = int((mp - e)//3)
+                d = int((mp)//3)
             elif m == 0:
-                h = int(mp - e)
+                h = int(mp)
             self.continuous_f_0 = 0
         else:
             d = 0
@@ -483,9 +485,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         b = int(b)
 
         sp_l = sp - c
-        mp_l = mp - a - b - 2*d - e
+        mp_l = mp - a - b - 2*d
 
-        return a, b, c, d, e, f, h, mp, sp, mp_l, sp_l
+        return a, b, c, d, e, f, h, mp + e, sp, mp_l, sp_l
 
     def g_function(self, i, j, t):
         """A function used in decision_function.
