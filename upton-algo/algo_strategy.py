@@ -122,7 +122,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             wall_locations_1 = [[0, 13], [1, 13], [2, 13], [4, 13], [24, 13], [25, 13], [26, 13], [27, 13]]
             game_state.attempt_spawn(WALL, wall_locations_1)
 
-            wall_locations_2 = [[4, 12], [21, 12], [22, 12][23, 12], [19, 9], [19, 10], [20, 10]]
+            wall_locations_2 = [[4, 12], [21, 12], [22, 12],[23, 12], [19, 9], [19, 10], [20, 10]]
             game_state.attempt_spawn(WALL, wall_locations_2)
 
             turret_locations = [[20, 9], [22, 11]]
@@ -195,7 +195,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         turn_number = game_state.turn_number
         if turn_number >= 5 and turn_number <= 20:
             wall_locations_d = [[2,13],[3,13],[24,13],[25,13],[4,12],[23,12]]
-            defenses_built = self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True):
+            defenses_built = self.build_defenses(game_state, wall_locations_d, WALL, mark_remove=True)
             if defenses_built != len(wall_locations_d):
                 return
         elif turn_number >= 21 and turn_number <= 50:
@@ -223,9 +223,10 @@ class AlgoStrategy(gamelib.AlgoCore):
             if upgrade:
                 locations_to_upgrade = [location for location in locations \
                     if game_state.contains_stationary_unit(location) and not game_state.contains_stationary_unit(location).upgraded]
-                number_upgraded = game_state.attempt_upgrade(locations_to_upgrade)
-                if len(locations_to_upgrade) != number_upgraded:
-                    return
+                if locations_to_upgrade:
+                    number_upgraded = game_state.attempt_upgrade(locations_to_upgrade)
+                    if len(locations_to_upgrade) != number_upgraded:
+                        return
             else:
                 if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
                     return
@@ -245,7 +246,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         else:
             unit_cost = base_unit_cost
         available_SP = game_state.get_resource(SP)
-        number_affordable = available_SP // unit_cost
+        number_affordable = int(available_SP // unit_cost)
+        gamelib.debug_write('number_affordable: {}'.format(number_affordable))
 
         # TODO if yes, build them, else return False
         if number_affordable == 0:
@@ -259,7 +261,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 upgrade_status = game_state.attempt_upgrade(locations[:number_affordable])
                 if build_status != upgrade_status:
                     raise Exception("Number of spawn buildings does not match upgraded buildings.")
-                if number_affordable < len(locaitons):
+                if number_affordable < len(locations):
                     build_status += self.build_defenses(game_state, locations[number_affordable:], unit_type, upgrade=False, mark_remove=mark_remove)
             if mark_remove:
                 game_state.attempt_remove(locations[:number_affordable])
@@ -279,28 +281,29 @@ class AlgoStrategy(gamelib.AlgoCore):
         hierarchy_index = building_hierarchy.index(unit_type)
 
         # find buildings to build
-        locations_to_build = [location for location in locaitons if not game_state.contains_stationary_unit(location)]
+        locations_to_build = [location for location in locations if not game_state.contains_stationary_unit(location)]
         number_to_build = len(locations_to_build)
 
         # find buildings to remove
-        locations_to_remove = self.find_low_hp_buildings(game_state=game_state, locaitons=locaitons, hp_percent=hp_percent)
-        game_state.attempt_remove(locations_to_remove)
+        locations_to_remove = self.find_low_hp_buildings(game_state=game_state, locations=locations, hp_percent=hp_percent)
+        if locations_to_remove:
+            game_state.attempt_remove(locations_to_remove)
 
         # build defenses in hierarchy
         defenses_built = 0
         for target_type in building_hierarchy[hierarchy_index:]:
             if locations_to_build:
-                defenses_built += self.build_defenses(locaitons=locations_to_build[:], unit_type=target_type, upgrade=upgrade, mark_remove=False)
+                defenses_built += self.build_defenses(game_state, locations=locations_to_build[:], unit_type=target_type, upgrade=upgrade, mark_remove=False)
                 locations_to_build = locations_to_build[defenses_built:]
         return defenses_built == number_to_build
 
 
-    def find_low_hp_buildings(self, game_state, locaitons, hp_percent):
+    def find_low_hp_buildings(self, game_state, locations, hp_percent):
         """ Find the buildings with hit points below hp_percent.
         """
         low_hp_locations = []
 
-        for location in locaitons:
+        for location in locations:
             unit = game_state.contains_stationary_unit(location)
             if unit and unit.health/unit.max_health < hp_percent: 
             # TODO Can .max_health give the health of an upgraded unit??
@@ -365,10 +368,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         #  e = (5<= r < 20) + 2*(20 <= r <40) + 3*(40 <= r < 60) + 4*(60 <= r < 80) + 5*(r <= 100)
         # TODO if r in [0, 100) the following is the optimal approach
         e = r // 20 + 1
-        term_a = g_function((x + .25*z)*w, y*w, w)
-        term_b = g_function(x + 0.25*z, y, w)
-        term_a_1 = g_function((x_1+.25*z_1)*w_1, y_1*w_1, w_1)
-        term_b_1 = g_function(x_1+0.25*z_1, y_1, w_1)
+        term_a = self.g_function((x + .25*z)*w, y*w, w)
+        term_b = self.g_function(x + 0.25*z, y, w)
+        term_a_1 = self.g_function((x_1+.25*z_1)*w_1, y_1*w_1, w_1)
+        term_b_1 = self.g_function(x_1+0.25*z_1, y_1, w_1)
 
         if (mp >= term_a - 5.5*w + term_b + 4 + r//10) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
             f = 0
@@ -421,13 +424,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         locations_z = [[1,15],[2,15],[1,14],[2,14],[3,14]]
         for location in locations_z:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == False):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == False):
                 z += 1
 
         locations_z_1 = [[25,15],[26,15],[24,14],[25,14],[26,14]]
         for location in locations_z_1:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == False):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == False):
                 z_1 += 1
 
         # total number of UPGRADED Turret
@@ -435,33 +438,36 @@ class AlgoStrategy(gamelib.AlgoCore):
         locations_x = [[1,15],[2,15]]
         for location in locations_x:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == True):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == True):
                 x += 1
 
         locations_y = [[1,14],[2,14],[3,14]]
         for location in locations_y:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == True):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == True):
                 y += 1
 
         locations_x_1 = [[25,15],[26,15]]
         for location in locations_x_1:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == True):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == True):
                 x_1 += 1
 
         locations_y_1 = [[24,14],[25,14],[26,14]]
         for location in locations_y_1:
             unit = game_state.contains_stationary_unit(location)
-            if (unit.unit_type == TURRET) and (unit.upgraded == True):
+            if unit and (unit.unit_type == TURRET) and (unit.upgraded == True):
                 y_1 += 1
 
         # w=0 represents empty grid, w=1 represents wall, w = 2 represents upgraded wall
         location_w = [0,14]
         unit_w = game_state.contains_stationary_unit(location_w)
-        if not unit_w: w = 0
-        if (WALL == unit_w.unit_type) and (unit_w.upgraded == False): w = 1
-        if (WALL == unit_w.unit_type) and (unit_w.upgraded == True): w = 2
+        if not unit_w:
+            w = 0
+        elif (WALL == unit_w.unit_type) and (unit_w.upgraded == False):
+            w = 1
+        elif (WALL == unit_w.unit_type) and (unit_w.upgraded == True):
+            w = 2
 
         location_w_1 = [27,14]
         unit_w_1 = game_state.contains_stationary_unit(location_w_1)
