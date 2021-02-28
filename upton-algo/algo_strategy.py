@@ -287,7 +287,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         Build defenses with hierarchy.
         """
-        building_hierarchy = [TURRET, WALL]
+        building_hierarchy = [TURRET, WALL, SUPPORT]
 
         hierarchy_index = building_hierarchy.index(unit_type)
 
