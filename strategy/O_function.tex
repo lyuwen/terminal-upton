@@ -8,7 +8,7 @@
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \begin{document}
 
-define $O(x,y,z,\bar{x},\bar{y},\bar{z},w,\bar{w},MP,SP,H,R) = (a,b,c,d,e,f,MP_l,SP_l)$.
+define $O(x,y,z,\bar{x},\bar{y},\bar{z},w,\bar{w},m,MP,SP,H,R) = (a,b,c,d,e,f,h,MP_l,SP_l)$.
 
 \begin{align*}
 e &= \mathbbm{1}\{5 \leq R <20\}	+2* \mathbbm{1}\{20 \leq R <40\} +	3*\mathbbm{1}\{40 \leq R <60\}\\
@@ -32,8 +32,12 @@ Here $\floor*{5.4} = 5$ means round down.
 &c=0 \quad\text{otherwise}	
 \end{align*}
  \begin{align*}
-& d = \floor*{\frac{MP-e}{4}} \quad \text{if $f = 0$ for previous $4$ sequential turns }\\
+& d = \floor*{\frac{MP-e}{3}} \quad \text{if $m=1$ and $f = 0$ for previous $4$ sequential turns }\\
 &d=0 \quad\text{otherwise}	
+\end{align*}
+ \begin{align*}
+& h = MP-e\quad \text{if $m=0$ and $f = 0$ for previous $4$ sequential turns }\\
+&h=0 \quad\text{otherwise}	
 \end{align*}
 \begin{align*}
 & a = g((\bar{x}+0.25\bar{z})\bar{w},\bar{y}\bar{w},\bar{w}) \quad \text{if $f = 1$}\\
