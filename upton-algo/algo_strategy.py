@@ -396,9 +396,9 @@ class AlgoStrategy(gamelib.AlgoCore):
                 c = 2
                 a = 6
                 b = mp - a
-                if ((term_a - 5.5*w + term_b) == 0) and (term_a_1 - 5.5*w_1 + term_b_1) != 0):
+                if ((term_a - 5.5*w + term_b) == 0) and ((term_a_1 - 5.5*w_1 + term_b_1) != 0):
                     f = 1
-                elif ((term_a - 5.5*w + term_b) != 0) and (term_a_1 - 5.5*w_1 + term_b_1) == 0):
+                elif ((term_a - 5.5*w + term_b) != 0) and ((term_a_1 - 5.5*w_1 + term_b_1) == 0):
                     f = 2
                 else:
                     f = random.randint(1, 2)
