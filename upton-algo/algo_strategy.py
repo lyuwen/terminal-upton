@@ -390,6 +390,24 @@ class AlgoStrategy(gamelib.AlgoCore):
             c = 0
             a = 0
             b = 0
+        elif ((term_a - 5.5*w + term_b) == 0 or (term_a_1 - 5.5*w_1 + term_b_1) == 0):
+            if mp >= 10:
+                self.continuous_f_0 = 0
+                c = 2
+                a = 6
+                b = mp - a
+                if ((term_a - 5.5*w + term_b) == 0) and (term_a_1 - 5.5*w_1 + term_b_1) != 0):
+                    f = 1
+                elif ((term_a - 5.5*w + term_b) != 0) and (term_a_1 - 5.5*w_1 + term_b_1) == 0):
+                    f = 2
+                else:
+                    f = random.randint(1, 2)
+            else:
+                f = 0
+                self.continuous_f_0 += 1
+                c = 0
+                a = 0
+                b = 0
         # TODO the above condition may not be necessary since all variables are intialed as 0
         elif (term_b - 5.5*w)/(term_a - 5.5*w + term_b) >= (term_b_1 - 5.5*w_1)/(term_a_1 - 5.5*w_1 + term_b_1):
             f = 1
