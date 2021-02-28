@@ -321,6 +321,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         a, b, c, d, e, f, mp_l, sp_l = self.decision_function(game_state)
 
+        gamelib.debug_write(f"main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l}")
+
         if d != 0 or e != 0:
             # TODO Demolisher & Interceptor
             game_state.attempt_spawn(DEMOLISHER, [15,1])
@@ -331,6 +333,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             self.build_defenses(game_state=game_state, locations=support_locations, unit_type=SUPPORT, upgrade=False, mark_remove=True)
         if f == 0:
             # left & right active defense
+            gamelib.debug_write("active defense on left & right")
             self.active_defense(game_state, defense_type=0) # left
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
@@ -521,6 +524,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         state_1 = (not game_state.contains_stationary_unit(opponent_sites[0])) or (game_state.contains_stationary_unit(opponent_sites[0]).pending_removal)
         state_2 = (not game_state.contains_stationary_unit(opponent_sites[1])) or (game_state.contains_stationary_unit(opponent_sites[1]).pending_removal)
         state_3 = (not game_state.contains_stationary_unit(opponent_sites[2])) or (game_state.contains_stationary_unit(opponent_sites[2]).pending_removal)
+        gamelib.debug_write(f"active defense at round {game_state.turn_number}: state_1={state_1} state_2={state_2} state_3={state_3}")
         # trigger == 1, when {[1,14],[2,14]} or {[1,14],[1,15]} are empty or deleted, == 0 otherwise
         #  trigger = (state_1 and state_2) or (state_1 and state_3)
         trigger = state_1 and (state_2 or state_3)
@@ -542,37 +546,6 @@ class AlgoStrategy(gamelib.AlgoCore):
                     return
                 if not game_state.attempt_upgrade(active_locations[4]):
                     return
-        
-
-    def get_active_defense_locations(self, defense_type):
-        """ Return the coordinates for active defense strategy
-        """
-        if defense_type == 0:
-            # Left active defense
-            return 
-        elif defense_type == 1:
-            # Right active defense
-            return
-        else:
-            raise ValueError
-
-
-    def active_defense(self, game_state, defense_type):
-        """ Build active defenses
-        """
-        active_locations = self.get_active_defense_locations(defense_type)
-        oppo_MP = game_state.get_resource(MP, player_index=1)
-        # marked deleted: game_state.contains_stationary_unit(location).pending_removal
-        if oppo_MP < 15:
-            pass
-        elif oppo_MP < 25:
-            pass
-        elif oppo_MP < 35:
-            pass
-        elif oppo_MP < 45:
-            pass
-        else:
-            pass
 
 
 if __name__ == "__main__":
