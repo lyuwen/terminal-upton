@@ -390,7 +390,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             c = 0
             a = 0
             b = 0
-        elif ((term_a - 5.5*w + term_b) == 0 or (term_a_1 - 5.5*w_1 + term_b_1) == 0):
+        elif ((term_a - 5.5*w + term_b) == 0) or ((term_a_1 - 5.5*w_1 + term_b_1) == 0):
             if mp >= 10:
                 self.continuous_f_0 = 0
                 c = 2
