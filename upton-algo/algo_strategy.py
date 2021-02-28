@@ -234,7 +234,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             else:
                 if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
                     return
-            if game_state.get_resource(SP) < SP_before_extra * 0.6:
+            if game_state.get_resource(SP) < SP_before_extra * 0.7:
+                gamelib.debug_write("extra static defense in turn {}: {} {}".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
                 return
 
 
@@ -326,9 +327,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         gamelib.debug_write(f"main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l}")
 
-        if d != 0 or e != 0:
-            # TODO Demolisher & Interceptor
+        if d != 0:
+            # Demolisher
             game_state.attempt_spawn(DEMOLISHER, [15,1])
+        if e != 0:
+            # Interceptor
             game_state.attempt_spawn(INTERCEPTOR, [19,5])
         if c!= 0:
             # Support
