@@ -341,6 +341,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
             # left active defense
+            if self.build_defenses(game_state, [21, 10], WALL, mark_remove=True):
+                return
             self.active_defense(game_state, defense_type=0) # left
 
             # 9 (c)
@@ -426,7 +428,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             b = mp - a
 
         if f == 0 and self.continuous_f_0 == 5:
-            d = (mp - e)//4
+            d = (mp - e)//3
             self.continuous_f_0 = 0
         else:
             d = 0
