@@ -341,7 +341,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
             # left active defense
-            if self.build_defenses(game_state, [21, 10], WALL, mark_remove=True):
+            if self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
                 return
             self.active_defense(game_state, defense_type=0) # left
 
