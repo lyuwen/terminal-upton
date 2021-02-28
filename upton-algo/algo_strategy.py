@@ -218,10 +218,14 @@ class AlgoStrategy(gamelib.AlgoCore):
                 (TURRET, [[19,10]], False),
                 (TURRET, [[20,10]], True),
                 (TURRET, [[19,10]], True),
+                (SUPPORT, [[14,9],[15,9]], False),
+                (SUPPORT, [[14,9],[15,9]], True),
                 (WALL, [[19,11],[20,11]], True),
                 (TURRET, [[22,12]], False),
                 (TURRET, [[22,12]], True),
                 (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], False),
+                (SUPPORT, [[14,8],[15,8]], False),
+                (SUPPORT, [[14,8],[15,8]], True),
                 (WALL, [[4,13],[5,13],[6,13],[17,12],[18,12],[19,12],[17,11],[18,11]], True),
                 ]:
             if upgrade:
