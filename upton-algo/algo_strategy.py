@@ -82,7 +82,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         else:
             self.static_defense(game_state)
             self.main_decision(game_state)
-            #  self.extra_static_defense(game_state)
+            self.extra_static_defense(game_state)
 
 
     def starter_build_defences(self, game_state):
@@ -235,7 +235,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
                     return
             if game_state.get_resource(SP) < SP_before_extra * 0.7:
-                gamelib.debug_write("\u001b[31m extra static defense in turn {}: {} {} \u001b[0m".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
+                gamelib.debug_write("\u001b[32m extra static defense in turn {}: {} {} \u001b[0m".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
                 return
 
 
@@ -333,10 +333,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         if e != 0:
             # Interceptor
             game_state.attempt_spawn(INTERCEPTOR, [19,5])
-        if c!= 0:
-            # Support
-            support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
-            self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
         if h != 0:
             # Scounts
             game_state.attempt_spawn(SCOUT, [15,1], h)
@@ -375,6 +371,10 @@ class AlgoStrategy(gamelib.AlgoCore):
             if b != 0:
                 scount_location_b = [[20,6]]
                 game_state.attempt_spawn(SCOUT, scount_location_b, b)
+        if c!= 0:
+            # Support
+            support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
+            self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
 
         return 1
 
