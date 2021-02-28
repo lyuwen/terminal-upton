@@ -370,6 +370,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, h, r = self.gather_info_from_gamestate(game_state)
         a, b, c, d, e, f, mp_l, sp_l = 0, 0, 0, 0, 0, 0, 0, 0
 
+        gamelib.debug_write(f"decision_function at round {r}: " \
+            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} h={h} r={r}")
+
         # TODO main decision for the strategy
         #  e = (5<= r < 20) + 2*(20 <= r <40) + 3*(40 <= r < 60) + 4*(60 <= r < 80) + 5*(r <= 100)
         # TODO if r in [0, 100) the following is the optimal approach
