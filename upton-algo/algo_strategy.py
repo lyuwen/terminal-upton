@@ -82,7 +82,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         else:
             self.static_defense(game_state)
             self.main_decision(game_state)
-            self.extra_static_defense(game_state)
+            #  self.extra_static_defense(game_state)
 
 
     def starter_build_defences(self, game_state):
@@ -235,7 +235,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 if not self.self_repair(game_state, locations, unit_type, hp_percent=0.5):
                     return
             if game_state.get_resource(SP) < SP_before_extra * 0.7:
-                gamelib.debug_write("extra static defense in turn {}: {} {}".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
+                gamelib.debug_write("\u001b[31m extra static defense in turn {}: {} {} \u001b[0m".format(game_state.turn_number, game_state.get_resource(SP), SP_before_extra))
                 return
 
 
@@ -254,7 +254,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             unit_cost = base_unit_cost
         available_SP = game_state.get_resource(SP)
         number_affordable = int(available_SP // unit_cost)
-        gamelib.debug_write('number_affordable: {}'.format(number_affordable))
+        gamelib.debug_write('\u001b[32m number_affordable: {} \u001b[0m'.format(number_affordable))
 
         # TODO if yes, build them, else return False
         if number_affordable == 0:
@@ -325,7 +325,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         a, b, c, d, e, f, h, mp_l, sp_l = self.decision_function(game_state)
 
-        gamelib.debug_write(f"main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l}")
+        gamelib.debug_write(f"\u001b[32m main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l} \u001b[0m")
 
         if d != 0:
             # Demolisher
@@ -336,18 +336,19 @@ class AlgoStrategy(gamelib.AlgoCore):
         if c!= 0:
             # Support
             support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
-            self.build_defenses(game_state=game_state, locations=support_locations, unit_type=SUPPORT, upgrade=False, mark_remove=True)
+            self.build_defenses(game_state=game_state, locations=support_locations[:c], unit_type=SUPPORT, upgrade=False, mark_remove=True)
         if h != 0:
             # Scounts
             game_state.attempt_spawn(SCOUT, [15,1], h)
         if f == 0:
             # left & right active defense
-            gamelib.debug_write("active defense on left & right")
+            gamelib.debug_write("\u001b[32m active defense on left & right \u001b[0m")
             self.active_defense(game_state, defense_type=0) # left
             self.active_defense(game_state, defense_type=1) # right
         elif f == 1:
             # left active defense
-            if self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
+            if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
+                gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
                 return
             self.active_defense(game_state, defense_type=0) # left
 
@@ -361,6 +362,9 @@ class AlgoStrategy(gamelib.AlgoCore):
                 game_state.attempt_spawn(SCOUT, scount_location_b, b)
         elif f == 2:
             # right active defense
+            if not self.build_defenses(game_state, [[21, 10]], WALL, mark_remove=True):
+                gamelib.debug_write(f"\u001b[31m building wall at [[21, 10]] failed\u001b[0m")
+                return
             self.active_defense(game_state, defense_type=1) # right
 
             # 9 (c)
@@ -381,8 +385,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, health, r, m = self.gather_info_from_gamestate(game_state)
         a, b, c, d, e, f, d, h, mp_l, sp_l = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-        gamelib.debug_write(f"decision_function at round {r}: " \
-            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} health={health} r={r}")
+        gamelib.debug_write(f"\u001b[32m decision_function at round {r}: " \
+            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} health={health} r={r} \u001b[0m")
 
         # TODO main decision for the strategy
         #  e = (5<= r < 20) + 2*(20 <= r <40) + 3*(40 <= r < 60) + 4*(60 <= r < 80) + 5*(r <= 100)
@@ -393,7 +397,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         term_a_1 = self.g_function((x_1+.25*z_1)*w_1, y_1*w_1, w_1)
         term_b_1 = self.g_function(x_1+0.25*z_1, y_1, w_1)
 
-        gamelib.debug_write(f"decision_function at round {r}: term_a={term_a}, term_b={term_b}, term_a_1={term_a_1}, term_b_1={term_b_1}")
+        gamelib.debug_write(f"\u001b[32m decision_function at round {r}: term_a={term_a}, term_b={term_b}, term_a_1={term_a_1}, term_b_1={term_b_1} \u001b[0m")
 
         if (mp <= term_a - 5.5*w + term_b + 4 + r//10) and (mp <= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
             f = 0
@@ -576,12 +580,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         state_1 = (not game_state.contains_stationary_unit(opponent_sites[0])) or (game_state.contains_stationary_unit(opponent_sites[0]).pending_removal)
         state_2 = (not game_state.contains_stationary_unit(opponent_sites[1])) or (game_state.contains_stationary_unit(opponent_sites[1]).pending_removal)
         state_3 = (not game_state.contains_stationary_unit(opponent_sites[2])) or (game_state.contains_stationary_unit(opponent_sites[2]).pending_removal)
-        gamelib.debug_write(f"active defense at round {game_state.turn_number}: state_1={state_1} state_2={state_2} state_3={state_3}")
+        gamelib.debug_write(f"\u001b[32m active defense at round {game_state.turn_number}: state_1={state_1} state_2={state_2} state_3={state_3} \u001b[0m")
         # trigger == 1, when {[1,14],[2,14]} or {[1,14],[1,15]} are empty or deleted, == 0 otherwise
         #  trigger = (state_1 and state_2) or (state_1 and state_3)
         trigger = state_1 and (state_2 or state_3)
         # marked deleted: game_state.contains_stationary_unit(location).pending_removal
+        gamelib.debug_write(f"\u001b[32m building active defense at round {game_state.turn_number} on type {defense_type}\u001b[0m")
         if self.build_defenses(game_state, active_locations[:2], WALL, mark_remove=True) < 2:
+            gamelib.debug_write(f"\u001b[31m active defense at round {game_state.turn_number} failed on type {defense_type} \u001b[0m")
             return
         #  if game_state.attempt_spawn(WALL, active_locations[:2]) < 2:
         #      return
