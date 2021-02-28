@@ -82,6 +82,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         else:
             self.static_defense(game_state)
             self.main_decision(game_state)
+            #  self.extra_static_defense(game_state)
 
 
     def starter_build_defences(self, game_state):
@@ -207,6 +208,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             if not self.self_repair(game_state=game_state, locations=upgraded_wall_locations_f, unit_type=WALL, hp_percent=.5, upgrade=True):
                 return
 
+
+    def extra_static_defense(self, game_state):
         # (g)
         for unit_type, locations, upgrade in [
                 (WALL, [[19,11],[20,11]], False),
@@ -372,6 +375,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         term_b = self.g_function(x + 0.25*z, y, w)
         term_a_1 = self.g_function((x_1+.25*z_1)*w_1, y_1*w_1, w_1)
         term_b_1 = self.g_function(x_1+0.25*z_1, y_1, w_1)
+
+        gamelib.debug_write(f"decision_function at round {r}: term_a={term_a}, term_b={term_b}, term_a_1={term_a_1}, term_b_1={term_b_1}")
 
         if (mp >= term_a - 5.5*w + term_b + 4 + r//10) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
             f = 0
