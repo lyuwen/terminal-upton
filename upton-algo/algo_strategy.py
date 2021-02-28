@@ -384,7 +384,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         gamelib.debug_write(f"decision_function at round {r}: term_a={term_a}, term_b={term_b}, term_a_1={term_a_1}, term_b_1={term_b_1}")
 
-        if (mp >= term_a - 5.5*w + term_b + 4 + r//10) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
+        if (mp <= term_a - 5.5*w + term_b + 4 + r//10) and (mp <= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//10):
             f = 0
             self.continuous_f_0 += 1
             c = 0
