@@ -4,7 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
-
+import numpy as np
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -323,7 +323,7 @@ class AlgoStrategy(gamelib.AlgoCore):
     def main_decision(self, game_state):
         """ The main responsive active defense and offense strategy.
         """
-        a, b, c, d, e, f, mp_l, sp_l = self.decision_function(game_state)
+        a, b, c, d, e, f, h, mp_l, sp_l = self.decision_function(game_state)
 
         gamelib.debug_write(f"main decision at round {game_state.turn_number}: a={a}, b={b}, c={c}, d={d}, e={e}, f={f}, mp_l={mp_l}, sp_l={sp_l}")
 
@@ -337,6 +337,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             # Support
             support_locations = [[13,3],[14,3],[15,4],[16,5],[17,6],[18,7],[14,4],[15,5],[16,6],[17,7]]
             self.build_defenses(game_state=game_state, locations=support_locations, unit_type=SUPPORT, upgrade=False, mark_remove=True)
+        if h != 0:
+            # Scounts
+            game_state.attempt_spawn(SCOUT, [15,1], h)
         if f == 0:
             # left & right active defense
             gamelib.debug_write("active defense on left & right")
@@ -375,11 +378,11 @@ class AlgoStrategy(gamelib.AlgoCore):
     def decision_function(self, game_state):
         """ The decision function for the main stage of the game.
         """
-        x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, h, r = self.gather_info_from_gamestate(game_state)
-        a, b, c, d, e, f, mp_l, sp_l = 0, 0, 0, 0, 0, 0, 0, 0
+        x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, health, r, m = self.gather_info_from_gamestate(game_state)
+        a, b, c, d, e, f, d, h, mp_l, sp_l = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
         gamelib.debug_write(f"decision_function at round {r}: " \
-            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} h={h} r={r}")
+            f"x={x} y={y} z={z} x_1={x_1} y_1={y_1} z_1={z_1} w={w} w_1={w_1} mp={mp} sp={sp} health={health} r={r}")
 
         # TODO main decision for the strategy
         #  e = (5<= r < 20) + 2*(20 <= r <40) + 3*(40 <= r < 60) + 4*(60 <= r < 80) + 5*(r <= 100)
@@ -431,7 +434,10 @@ class AlgoStrategy(gamelib.AlgoCore):
             b = mp - a
 
         if f == 0 and self.continuous_f_0 == 5:
-            d = (mp - e)//3
+            if m == 1:
+                d = int((mp - e)//3)
+            elif m == 0:
+                h = int(mp - e)
             self.continuous_f_0 = 0
         else:
             d = 0
@@ -443,7 +449,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         sp_l = sp - c
         mp_l = mp - a - b - 2*d - e
 
-        return a, b, c, d, e, f, mp_l, sp_l
+        return a, b, c, d, e, f, h, mp_l, sp_l
 
     def g_function(self, i, j, t):
         """A function used in decision_function.
@@ -455,10 +461,10 @@ class AlgoStrategy(gamelib.AlgoCore):
     def gather_info_from_gamestate(self, game_state):
         """ Gather information from GameState for the decision function.
         """
-        x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, h, r = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, health, r = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         # TODO parse information from the GameState object
         r = game_state.turn_number
-        h = game_state.my_health # my health
+        health = game_state.my_health # my health
         mp = game_state.get_resource(MP) # my mobile points
         sp = game_state.get_resource(SP) # my structure points
         # total number of Turret(not upgraded)
@@ -520,7 +526,24 @@ class AlgoStrategy(gamelib.AlgoCore):
             else:
                 w_1 = 2
 
-        return x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, h, r
+        x_start = 7
+        x_range = 14
+        y_start = 9
+        y_range = 4
+        locations = np.array(np.unravel_index(np.arange(x_range * y_range), (x_range, y_range))).T + np.array([x_start, y_start])
+        s_count = 0
+        s_threshold = 14
+        m = 0
+        for location in locations:
+            unit = game_state.contains_stationary_unit(location)
+            if unit and unit.unit_type in [WALL, TURRET]:
+                s_count += 0
+                if s_count > s_threshold:
+                    m = 1
+                    break
+
+
+        return x, y, z, x_1, y_1, z_1, w, w_1, mp, sp, health, r, m
 
     def get_active_defense_locations(self, defense_type):
         """ Return the coordinates for active defense strategy
