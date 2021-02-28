@@ -426,7 +426,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def left_offensive_walls(self, game_state):
         wall_locations = [[2,13],[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4],[12,3],[13,2],[14,2]]
-        turret_locations = [[3,13]]
+        turret_locations = [[3,12]]
         walls_built = self.build_defenses(game_state, wall_locations, WALL, mark_remove=True)
         turrets_built = self.build_defenses(game_state, turret_locations, TURRET, upgrade=True, mark_remove=True)
         return walls_built + turrets_built
