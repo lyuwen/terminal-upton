@@ -424,7 +424,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             a = 0
             b = 0
 
-        if (mp >= term_a - 5.5*w + term_b + 4 + r//20) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
+        elif (mp >= term_a - 5.5*w + term_b + 4 + r//20) and (mp >= term_a_1 - 5.5*w_1 + term_b_1 + 4 + r//20):
             if ((term_a - 5.5*w + term_b) == 0) or ((term_a_1 - 5.5*w_1 + term_b_1) == 0):
                 if mp >= 10 + r//4:
                     self.continuous_f_0 = 0
