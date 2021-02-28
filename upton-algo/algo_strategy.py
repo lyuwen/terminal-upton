@@ -606,16 +606,20 @@ class AlgoStrategy(gamelib.AlgoCore):
                     return
                 #  if not game_state.attempt_spawn(TURRET, active_locations[2]):
                 #      return
+                if not game_state.attempt_upgrade(active_locations[2]):
+                    return
             if oppo_MP >= 35:
                 if not game_state.attempt_upgrade(active_locations[2]):
                     return
-            if oppo_MP >= 45:
-                if self.build_defenses(game_state, active_locations[3], TURRET, mark_remove=True):
-                    return
-                #  if not game_state.attempt_spawn(TURRET, active_locations[3]):
-                #      return
                 if not game_state.attempt_upgrade(active_locations[3]):
                     return
+            #  if oppo_MP >= 45:
+            #      if self.build_defenses(game_state, active_locations[3], TURRET, mark_remove=True):
+            #          return
+            #      #  if not game_state.attempt_spawn(TURRET, active_locations[3]):
+            #      #      return
+            #      if not game_state.attempt_upgrade(active_locations[3]):
+            #          return
 
 
 if __name__ == "__main__":
